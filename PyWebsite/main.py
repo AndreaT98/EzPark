@@ -1,7 +1,5 @@
-from operator import contains
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, request
 import boto3
-from boto3.dynamodb.conditions import Attr
 import json
 
 found=1
@@ -14,7 +12,6 @@ def hello_world():
     else:
         city=request.form['cities']
         zone=request.form['zones']
-        print (city,zone,"aaaa")
         json=getFreeParkings(str(city), str(zone), "static_mode")
         return render_template("index.html", result=json, length=len(json), found=found, zone=zone)
 
@@ -50,8 +47,6 @@ def getFreeParkings(city, zone, mode):
 
 def call_function():
     client = boto3.client('lambda', endpoint_url="http://localhost:4566")
-    
-
 
     response = client.invoke(
         FunctionName='Nearest_Parking_Area_Function',
@@ -67,16 +62,12 @@ def decode_response(data):
     js = json.loads(data)
     js_len=len(js)
     if -1 in js:
-        print ("SET FOUND TO 0!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         found=0
         js.pop()
     else:
         found=1
-    print(js)
     if js_len!=0:
         for i in range(len(js)):
-            print (js[i])
             for value in js[i].values():
-                print (value)
                 coords_list.append(value)  
     return coords_list
