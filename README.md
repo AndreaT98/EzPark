@@ -143,6 +143,16 @@ If there are no free parking spot in the zone he chose, the website will show al
 - Select the city and zone you want to see free parking spots and click "Submit"
 - If you want to get all free parking spots near the user, click the "Find parkings near me!" anchor.
 
+**7. Test the email service**
+- The email service is triggered automatically when the lambda function detects an error in the sensors. To make everything work fine, you have to add the email address used in the test as a "verified identity". You can do that with the command:
+
+`aws ses verify-email-identity --email-address amazon-aws@amazon.com --endpoint-url=http://localhost:4566`
+
+- Because the project is using LocalStack, no real email will be sent, but a "fake" email will be generated inside LocalStack Data folder
+- You can generate an email with the following command:
+
+`aws ses send-email  --from amazon-aws@amazon.com --message 'Body={Text={Data="Test"}},Subject={Data="Test"}' --destination 'ToAddresses=user@example.com' --endpoint-url=http://localhost:4566`
+
 ## Future work
 - Add more sensors in Campania and other regions of Italy
 - Expand the website to implement more features
