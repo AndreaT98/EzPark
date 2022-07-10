@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.14.1/css/ol.css" type="text/css">
+    <style>
+      .map {
+        height: 600px;
+        width: 100%;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.14.1/build/ol.js"></script>
+    <title>Free Parking Areas</title>
+  </head>
+  <body>
+    <h2>Find Free Parking Areas</h2>
+    {% for key,value in result.items() %}
+      <h3>{{value}}</h3>
+    {% endfor %}
+    <form action="#">
+      <label for="cities">City</label>
+      <select name="cities" id="zones">
+        <option value="Caserta">Caserta</option>
+        <option value="Napoli">Napoli</option>
+        <option value="Salerno">Salerno</option>
+      </select>
+      Zone <select name="zones" id="zones">
+        <option value="Via Rossi">Via Rossi</option>
+        <option value="Via Verdi">Via Verdi</option>
+      </select>
+      <input type="submit" value="Submit" />
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+
+const features = [];
+      for (i = 0; i < 1; i++) {
+        features.push(new ol.Feature({
+          geometry: new ol.geom.Point(ol.proj.fromLonLat([
+          14.357, 41.075
+          ]))
+        }));
+      }
+
+const source = new ol.source.Vector({features});
+
+const vector = new ol.layer.Vector({
+  source: source,
+  style: new ol.style.Style({
+          image: new ol.style.Circle({
+            radius: 5,
+            fill: new ol.style.Fill({color: 'blue'})
+          })
+        })
+});
+      var map = new ol.Map({
+        target: 'map',
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          })
+        , vector],
+        view: new ol.View({
+          center: ol.proj.fromLonLat([14.357, 41.075]),
+          zoom: 18
+        })
+      });
+
+    let draw; // global so we can remove it later
+function addInteraction() {
+  const value = 'Point';
+  if (value !== 'None') {
+    draw = new ol.interaction.Draw({
+      source: source,
+      type: 'Point',
+    });
+    map.addInteraction(draw);
+  }
+}
+
+
+/**
+ * Handle change event.
+ */
+
+
+    </script>
+  </body>
+</html>

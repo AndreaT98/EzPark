@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.14.1/css/ol.css" type="text/css">
+    <style>
+      .map {
+        height: 600px;
+        width: 100%;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.14.1/build/ol.js"></script>
+    <title>Free Parking Areas</title>
+  </head>
+  <body>
+    <h3 id="error" hidden>It looks like there are no free parks in this zone, but let me show you all free parks in a 300m range: </h3>
+    <h2>Find Free Parking Areas</h2>
+    <form action="/" method="post">
+      <label for="cities">City</label>
+      <select name="cities" id="zones">
+        <option value="Caserta">Caserta</option>
+        <option value="Napoli">Napoli</option>
+        <option value="Salerno">Salerno</option>
+      </select>
+      Zone <select name="zones" id="zones">
+        <option value="10001">Via Rossi</option>
+        <option value="10002">Via Verdi</option>
+      </select>
+      <input type="submit" value="Submit" />
+    <br>  
+    <h3>Your coordinates are [41.076448, 14.357053]</h3>
+    <a href="http://localhost:5000//nearestParkings">Find parkings near me!</a>
+    <br>  
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+
+const features = [];
+      "{%if length%}"
+      "{% for i in range(length) %}"
+      "{% if i%2==0%}"
+      console.log('{{result[i+1]}}');
+      "{%endif%}"
+      "{%endfor%}"
+      for (i = 0; i < "{{length}}"; i=i+2) {
+        console.log('{{result[0]}}');
+      }
+      "{% for i in range(length) %}"
+        "{% if i%2==0%}"
+        features.push(new ol.Feature({
+          geometry: new ol.geom.Point(ol.proj.fromLonLat([
+          "{{result[i+1]}}", "{{result[i]}}"
+          ]))
+        }));
+        "{%endif%}"
+      "{%endfor%}"
+      "{%endif%}"
+
+const source = new ol.source.Vector({features});
+console.log("{{found}}");
+const vector = new ol.layer.Vector({
+  source: source,
+  style: new ol.style.Style({
+          image: new ol.style.Circle({
+            radius: 8,
+            fill: new ol.style.Fill({color: 'green'})
+          })
+        })
+});
+      var map = new ol.Map({
+        target: 'map',
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          })
+        , vector],
+        view: new ol.View({
+          center: ol.proj.fromLonLat([14.357, 41.075]),
+          zoom: 18
+        })
+      });
+"{%if found==0 and not user_coords and zone=='10001'%}"
+document.getElementById("error").hidden=false;
+var centerLongitudeLatitude = ol.proj.fromLonLat([14.356446, 41.074013]);
+"{%endif%}"
+"{%if found==0 and not user_coords and zone=='10002'%}"
+document.getElementById("error").hidden=false;
+var centerLongitudeLatitude = ol.proj.fromLonLat([14.357, 41.075]);
+"{%endif%}"
+"{%if found==0 and user_coords%}"
+var centerLongitudeLatitude = ol.proj.fromLonLat(["{{user_coords[1]}}", "{{user_coords[0]}}"]);
+"{%endif%}"
+"{%if found==0%}"
+var layer = new ol.layer.Vector({
+  source: new ol.source.Vector({
+    projection: 'EPSG:4326',
+    features: [new ol.Feature(new ol.geom.Circle(centerLongitudeLatitude, 300))]
+  }),
+  style: [
+    new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: 'blue',
+        width: 3
+      }),
+      fill: new ol.style.Fill({
+        color: 'rgba(0, 0, 255, 0.1)'
+      })
+    })
+  ]
+});
+map.addLayer(layer);
+"{%endif%}"
+
+    let draw; // global so we can remove it later
+function addInteraction() {
+  const value = 'Point';
+  if (value !== 'None') {
+    draw = new ol.interaction.Draw({
+      source: source,
+      type: 'Point',
+    });
+    map.addInteraction(draw);
+  }
+}
+
+
+/**
+ * Handle change event.
+ */
+
+
+    </script>
+  </body>
+</html>
