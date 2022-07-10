@@ -3,7 +3,7 @@ import boto3
 dynamodb = boto3.resource('dynamodb', endpoint_url="http://localhost:4566")
 
 table = dynamodb.create_table(
-    TableName='Parcheggio',
+    TableName='Parkings',
     KeySchema=[
         {
             'AttributeName': 'parking_area_id',

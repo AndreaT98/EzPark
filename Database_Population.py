@@ -4,7 +4,7 @@ import random
 
 dynamodb = boto3.resource('dynamodb', endpoint_url="http://localhost:4566")
 
-table = dynamodb.Table('Parcheggio')
+table = dynamodb.Table('Parkings')
 41.074013, 14.356446
 zones = [
     ('10001', 'Via Rossi', 'Caserta', '41.0739081', '14.3564235'), 
