@@ -129,7 +129,7 @@ If there are no free parking spot in the zone he chose, the website will show al
 - Open Node-RED at:
 `http://localhost:1880/`
 
-- Import the flow named "EzPark_flow.json"
+- Import the flow named `EzPark_flow.json`
 - Click on the little square to the left of the node "timestamp" to start the simulation
 - You can check that the sensors are updated on the database every 30s. To see the changes you can view the DB table as follows:
 
@@ -142,9 +142,6 @@ If there are no free parking spot in the zone he chose, the website will show al
 
 - Select the city and zone you want to see free parking spots and click "Submit"
 - If you want to get all free parking spots near the user, click the "Find parkings near me!" anchor.
-
-**7. Trigger an error**
-
 
 ## Future work
 - Add more sensors in Campania and other regions of Italy
