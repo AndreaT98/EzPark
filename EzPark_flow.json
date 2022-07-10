@@ -1,0 +1,126 @@
+[
+    {
+        "id": "cfd4ad9b.72d9b",
+        "type": "tab",
+        "label": "Parking_Area",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "98d5a23.ecf0e6",
+        "type": "function",
+        "z": "cfd4ad9b.72d9b",
+        "name": "Parkings_Simulation",
+        "func": "function getRandomInt(max) {\n  return Math.floor(Math.random() * max);\n}\nvar parking_areas=[];\nparking_area=['1', '41.0737547', '14.3563383', getRandomInt(2), 'Caserta', 'Via Rossi'];\nparking_areas.push(parking_area);\nparking_area=['2', '41.0737997', '14.3563568', getRandomInt(2), 'Caserta', 'Via Rossi'];\nparking_areas.push(parking_area); \nparking_area=['3', '41.0750437', '14.3570320', getRandomInt(2), 'Caserta', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['4', '41.0750480', '14.3569251', getRandomInt(2), 'Caserta', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['5', '41.0750934', '14.3569521', getRandomInt(2), 'Napoli', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['6', '41.0750480', '14.3569621', getRandomInt(2), 'Napoli', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['7', '41.0750480', '14.3569721', getRandomInt(2), 'Caserta', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['8', '41.0750480', '14.3569821', getRandomInt(2), 'Salerno', 'Via Verdi'];\nparking_areas.push(parking_area);\nnode.warn(parking_areas);\nAWS.config.update({\n    endpoint: 'http://host.docker.internal:4566',\n    region: 'us-east-2',\n    accessKeyId: 'test',\n    secretAccessKey: 'test',\n});\n\n\nAWS.config.sqs = { endpoint: \"http://host.docker.internal:4566\" };\n// Create an SQS service object\nvar sqs = new AWS.SQS({apiVersion: '2012-11-05'});\nfor (i=0; i<parking_areas.length; i++){\nvar params = {\n   // Remove DelaySeconds parameter and value for FIFO queues\n  DelaySeconds: 0,\n  MessageAttributes: {},\n  MessageBody: '{\"id\": \"'+parking_areas[i][0]+'\",\"latitude\": \"'+parking_areas[i][1]+'\",\"longitude\": \"'+parking_areas[i][2]+'\",\"free\": \"'+parking_areas[i][3]+'\",\"city\": \"'+parking_areas[i][4]+'\",\"zone\": \"'+parking_areas[i][5]+'\"}',\n  QueueUrl: \"http://host.docker.internal:4566/000000000000/\"+parking_areas[i][4]+\"_sensors\"\n};\n\nsqs.sendMessage(params, function(err, data) {\n  if (err) {\n    node.warn(err);\n    msg.payload=msg.payload+err;\n  } else {\n    node.warn(\"Success on sending\");\n    node.warn(data);\n    msg.payload=msg.payload+data;\n  }\n});\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "node.warn(\"onStart\")\n",
+        "finalize": "// Code added here will be run when the\n// node is being stopped or re-deployed.\nconsole.log(\"Error\", \"funge\");",
+        "libs": [
+            {
+                "var": "AWS",
+                "module": "aws-sdk"
+            }
+        ],
+        "x": 540,
+        "y": 180,
+        "wires": [
+            [
+                "7e027818.c899b8",
+                "32849cd3.cb2ae4"
+            ]
+        ]
+    },
+    {
+        "id": "6a9a79ba.e57368",
+        "type": "trigger",
+        "z": "cfd4ad9b.72d9b",
+        "name": "",
+        "op1": "1",
+        "op2": "0",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "-30",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 250,
+        "y": 180,
+        "wires": [
+            [
+                "98d5a23.ecf0e6"
+            ]
+        ]
+    },
+    {
+        "id": "7e027818.c899b8",
+        "type": "function",
+        "z": "cfd4ad9b.72d9b",
+        "name": "Update_Free_Parking_Areas",
+        "func": "AWS.config.region = 'us-east-2';\nAWS.config.lambda = { \n    endpoint: \"host.docker.internal:4566\",\n    sslEnabled: false,\n    region: 'us-east-2',\n    accessKeyId: 'test',\n    secretAccessKey: 'test'};\nvar lambda = new AWS.Lambda({endpoint: 'host.docker.internal:4566'});\n\n\nvar params = {\n    FunctionName: 'Update_Free_Parking_Area_Function', // the lambda function we are going to invoke\n    InvocationType: 'Event',\n    LogType: 'Tail',\n    Payload: ''\n  };\n\n  lambda.invoke(params, function(err, data) {\n    if (err) {\n      node.warn(err);\n    } else {\n      return data.Payload;\n    }\n  });",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "AWS",
+                "module": "aws-sdk"
+            }
+        ],
+        "x": 840,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "38679979.d36216",
+        "type": "inject",
+        "z": "cfd4ad9b.72d9b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 120,
+        "wires": [
+            [
+                "6a9a79ba.e57368"
+            ]
+        ]
+    },
+    {
+        "id": "32849cd3.cb2ae4",
+        "type": "file",
+        "z": "cfd4ad9b.72d9b",
+        "name": "log.txt",
+        "filename": "./log.txt",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 770,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    }
+]
