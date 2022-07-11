@@ -39,33 +39,22 @@ If there are no free parking spot in the zone he chose, the website will show al
 1. [Docker](https://docs.docker.com/get-docker/)
 2. [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 3. [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html)
-4. [Node-RED](https://nodered.org/#get-started) for sensors simulation. 
-5. [Flask](https://flask.palletsprojects.com/en/2.1.x/quickstart/) used to run the application website `pip install Flask`
+4. [Flask](https://flask.palletsprojects.com/en/2.1.x/quickstart/) used to run the application website `pip install Flask`
 
 ### Setting up the environment
 **0. Clone the repository**
 
-`git clone https://github.com/AndreaT98/EzPark/EzPark.git`
+`git clone https://github.com/AndreaT98/EzPark.git`
 
-**1. Launch [LocalStack](https://localstack.cloud/) and Node-RED in a network (in this case "iot")**
+**1. Launch [LocalStack](https://localstack.cloud/), Eclipse Mosquitto and Node-RED in a network on Docker (in this case "iot")**
 
 `docker run --rm --network iot -it -p 4566:4566 -p 4571:4571 localstack/localstack`
 
+`docker run -itd --network iot --name mybroker eclipse-mosquitto mosquitto -c /mosquitto-no-auth.conf`
+
 `docker run -itd -p 1880:1880 -v node_red_data:/data --network iot --name mynodered nodered/node-red`
 
-**2. Create a SQS queue for each city (We will create only 3 for now)**
-
-`aws sqs create-queue --queue-name Caserta_sensors --endpoint-url=http://localhost:4566`
-
-`aws sqs create-queue --queue-name Napoli_sensors --endpoint-url=http://localhost:4566`
-
-`aws sqs create-queue --queue-name Salerno_sensors --endpoint-url=http://localhost:4566`
-
-- Check that the queues have been correctly created
-	
-`aws sqs list-queues --endpoint-url=http://localhost:4566`
-
-**3. Create the DynamoDB table and populate it**
+**2. Create the DynamoDB table and populate it**
 	
 1) Use the python code to create the DynamoDB table
 	
@@ -83,7 +72,7 @@ If there are no free parking spot in the zone he chose, the website will show al
 	
 `aws dynamodb scan --table-name Parkings --endpoint-url=http://localhost:4566`
 
-**4. Create the Lambda functions**
+**3. Create the Lambda functions**
 1) Create the role
 
 `aws iam create-role --role-name lambdarole --assume-role-policy-document file://role_policy.json --query 'Role.Arn' --endpoint-url=http://localhost:4566`
@@ -104,7 +93,7 @@ If there are no free parking spot in the zone he chose, the website will show al
 
 `aws lambda create-function --function-name Update_Free_Parking_Area_Function --zip-file fileb://Update_Free_Parking_Areas.zip --handler Update_Free_Parking_Areas.lambda_handler --runtime python3.10.3 --role arn:aws:iam::000000000000:role/lambdarole --endpoint-url=http://localhost:4566`
 
-**5. Launch the website**
+**4. Launch the website**
 1) Set the environment variable
 
 - Open a shell inside the folder /PyWebsite and set the environment variable as follows:
@@ -119,11 +108,11 @@ If there are no free parking spot in the zone he chose, the website will show al
 
 - `$ flask run`
 
-- The application will start on localhost with port 5000 at:
+- The application will start on localhost with default port 5000 at:
 
 `http://localhost:5000/`
 
-**6. Test the application**
+**5. Test the application**
 1) Test the sensors simulation
 
 - Open Node-RED at:
@@ -143,7 +132,7 @@ If there are no free parking spot in the zone he chose, the website will show al
 - Select the city and zone you want to see free parking spots and click "Submit"
 - If you want to get all free parking spots near the user, click the "Find parkings near me!" anchor.
 
-**7. Test the email service**
+**6. Test the email service**
 - The email service is triggered automatically when the lambda function detects an error in the sensors. To make everything work fine, you have to add the email address used in the test as a "verified identity". You can do that with the command:
 
 `aws ses verify-email-identity --email-address amazon-aws@amazon.com --endpoint-url=http://localhost:4566`
@@ -152,6 +141,12 @@ If there are no free parking spot in the zone he chose, the website will show al
 - You can generate an email with the following command:
 
 `aws ses send-email  --from amazon-aws@amazon.com --message 'Body={Text={Data="Test"}},Subject={Data="Test"}' --destination 'ToAddresses=user@example.com' --endpoint-url=http://localhost:4566`
+
+## Known bug
+- There is a bug that appears on every invocation of the "Nearest_Parking_Area_Function" after it is created for the first time.
+- The only way I found to temporarly fix the bug is to modify the following code inside the python file
+<p><img src="./images/known_bug.png"/></p>
+- All you have to do is remove or add (if they have already been removed) the purple brackets at row 16
 
 ## Future work
 - Add more sensors in Campania and other regions of Italy
