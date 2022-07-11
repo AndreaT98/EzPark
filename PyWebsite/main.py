@@ -6,20 +6,20 @@ found=1
 app = Flask(__name__)
 
 @app.route("/", methods=('GET', 'POST'))
-def hello_world():
+def index():
     if request.method == "GET":
         return render_template("index.html")
     else:
         city=request.form['cities']
         zone=request.form['zones']
-        json=getFreeParkings(str(city), str(zone), "static_mode")
-        return render_template("index.html", result=json, length=len(json), found=found, zone=zone)
+        result=getFreeParkings(str(city), str(zone), "static_mode")
+        return render_template("index.html", result=result, length=len(result), found=found, zone=zone)
 
 @app.route("/nearestParkings", methods=('GET', 'POST'))
 def nearestParkings():
     user_coordinates=[41.076448, 14.357053]
-    json=getFreeParkings("Caserta", "10001", "user_mode")
-    return render_template("index.html", result=json, length=len(json), found=0, user_coords=user_coordinates)
+    result=getFreeParkings("Caserta", "10001", "user_mode")
+    return render_template("index.html", result=result, length=len(result), found=0, user_coords=user_coordinates)
 
 
 

@@ -1,17 +1,11 @@
 import boto3
-import datetime
-import random
 
-dynamodb = boto3.resource('dynamodb', endpoint_url="http://localhost:4566")
-
-table = dynamodb.Table('Parkings')
-41.074013, 14.356446
 zones = [
     ('10001', 'Via Rossi', 'Caserta', '41.0739081', '14.3564235'), 
     ('10002', 'Via Verdi', 'Caserta', '41.074013', '14.356446'), 
-    ('10003', 'Via Verdi', 'Napoli', '41.0750649', '14.3566230'),
+    ('10003', 'Via Rossi', 'Napoli', '41.0750649', '14.3566230'),
     ('10004', 'Via Verdi', 'Napoli', '41.0750649', '14.3566230'),
-    ('10005', 'Via Verdi', 'Salerno', '41.0750649', '14.3566230'),
+    ('10005', 'Via Rossi', 'Salerno', '41.0750649', '14.3566230'),
     ('10006', 'Via Verdi', 'Salerno', '41.0750649', '14.3566230')]
 parking_areas=[('1', '41.0737547', '14.3563383', 0, 'Caserta', '10001'),
  ('2', '41.0737997', '14.3563568', 0, 'Caserta', '10001'),
@@ -22,19 +16,9 @@ parking_areas=[('1', '41.0737547', '14.3563383', 0, 'Caserta', '10001'),
  ('7', '41.0750480', '14.3569721', 0, 'Caserta', '10002'),
  ('8', '41.0750480', '14.3569821', 1, 'Salerno', '10002'),]
 
-'''41,0737547 14,3563383
-41,0737997 14,3563568
+dynamodb = boto3.resource('dynamodb', endpoint_url="http://localhost:4566")
 
-41,0750437 14,3570320
-41,0750480 14,3569251
-
-device_ids = []
-
-for city, device_id in cities:
-    city_devices = ""
-    for i in range(device_id):
-        city_devices = city_devices + ("%s_%s") % (city, str(i)) + " "
-    device_ids.append(city_devices)'''
+table = dynamodb.Table('Parkings')
 
 for i in range(len(parking_areas)):
     item = {
