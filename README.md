@@ -4,7 +4,7 @@
 Have you ever wondered if there is an easier way to find parking for your car? Well then, EzPark is for you!
 With EzPark website, you can have a view of all free parkings in a specific zone of your city or around your actual position. It uses the data collected by IoT sensors, placed each one on a specific parking spot, stored on a Cloud NoSQL Database to show you the nearest free parking spot. 
 
-For now, all sensors are placed in major cities of Campania region (Italy). Sensors send messages on a queue related to its city. Everytime a car parks in/leaves a parking spot, the sensor updates the status of its parking spot on the database. Each sensor sends the following informations:
+For now, all sensors are placed in major cities of Campania region (Italy). Everytime a car parks in/leaves a parking spot, the sensor updates the status of its parking spot on the database. Each sensor sends the following informations:
 - ID;
 - Latitude;
 - Longitude;
