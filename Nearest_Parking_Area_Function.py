@@ -6,7 +6,7 @@ from boto3.dynamodb.conditions import Attr
 def lambda_handler(event, context):
     dynamodb = boto3.resource('dynamodb', endpoint_url="http://localhost:4566")
 
-    table = dynamodb.Table('Parcheggio')
+    table = dynamodb.Table('Parkings')
     table_zone = dynamodb.Table('Zone')
     lista=list()
     user_coordinates=[41.076448, 14.357053]
@@ -47,21 +47,22 @@ def lambda_handler(event, context):
 def find_free_parking_areas_nearby(lat, lon, city):
     dynamodb = boto3.resource('dynamodb', endpoint_url="http://localhost:4566")
 
-    table = dynamodb.Table('Parcheggio')
+    table = dynamodb.Table('Parkings')
 
-    distances = []
+    spots = []
 
     db_response = table.scan(
-        FilterExpression=(Attr('parking_area_city').eq(city)) & (Attr('parking_area_free').eq('1'))
+        FilterExpression=Attr('parking_area_city').eq(city) & Attr('parking_area_free').eq(1)
     )
+
     for item in db_response['Items']:
         item_lat = float(item['parking_area_latitude'])
         item_lon = float(item['parking_area_longitude'])
         distance = calculate_distance(lat, lon, item_lat, item_lon)
         if(distance < 0.3 ):
             response_text=({"latitude=": item_lat, "longitude=": item_lon})
-            distances.append(response_text)
-    return distances
+            spots.append(response_text)
+    return spots
 
 
 def calculate_distance(lat1, lon1, lat2, lon2):

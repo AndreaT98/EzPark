@@ -26,7 +26,7 @@ def nearestParkings():
 
 dynamodb = boto3.resource('dynamodb', endpoint_url="http://localhost:4566")
 
-table = dynamodb.Table('Parcheggio')
+table = dynamodb.Table('Parkings')
 
 def getFreeParkings(city, zone, mode):
     client = boto3.client('lambda', endpoint_url="http://localhost:4566")
@@ -35,7 +35,6 @@ def getFreeParkings(city, zone, mode):
     elif mode == "user_mode":
         payload= '{"city": "'+city+'", "zone": "'+zone+'","mode": "user_mode"}'
     
-
     response = client.invoke(
         FunctionName='Nearest_Parking_Area_Function',
         InvocationType='RequestResponse',
@@ -45,22 +44,13 @@ def getFreeParkings(city, zone, mode):
     coords_list= decode_response(response)
     return coords_list
 
-def call_function():
-    client = boto3.client('lambda', endpoint_url="http://localhost:4566")
-
-    response = client.invoke(
-        FunctionName='Nearest_Parking_Area_Function',
-        InvocationType='RequestResponse',
-        LogType='Tail',
-        Payload=b'bytes'
-    )
-
 def decode_response(data):
     data = data['Payload'].read().decode()
     global found
     coords_list=[]
     js = json.loads(data)
     js_len=len(js)
+    print (js)
     if -1 in js:
         found=0
         js.pop()
