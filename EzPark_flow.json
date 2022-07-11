@@ -11,10 +11,10 @@
         "type": "function",
         "z": "cfd4ad9b.72d9b",
         "name": "Parkings_Simulation",
-        "func": "function getRandomInt(max) {\n  return Math.floor(Math.random() * max);\n}\nvar parking_areas=[];\nparking_area=['1', '41.0737547', '14.3563383', getRandomInt(2), 'Caserta', 'Via Rossi'];\nparking_areas.push(parking_area);\nparking_area=['2', '41.0737997', '14.3563568', getRandomInt(2), 'Caserta', 'Via Rossi'];\nparking_areas.push(parking_area); \nparking_area=['3', '41.0750437', '14.3570320', getRandomInt(2), 'Caserta', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['4', '41.0750480', '14.3569251', getRandomInt(2), 'Caserta', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['5', '41.0750934', '14.3569521', getRandomInt(2), 'Napoli', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['6', '41.0750480', '14.3569621', getRandomInt(2), 'Napoli', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['7', '41.0750480', '14.3569721', getRandomInt(2), 'Caserta', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['8', '41.0750480', '14.3569821', getRandomInt(2), 'Salerno', 'Via Verdi'];\nparking_areas.push(parking_area);\nnode.warn(parking_areas);\nAWS.config.update({\n    endpoint: 'http://host.docker.internal:4566',\n    region: 'us-east-2',\n    accessKeyId: 'test',\n    secretAccessKey: 'test',\n});\n\n\nAWS.config.sqs = { endpoint: \"http://host.docker.internal:4566\" };\n// Create an SQS service object\nvar sqs = new AWS.SQS({apiVersion: '2012-11-05'});\nfor (i=0; i<parking_areas.length; i++){\nvar params = {\n   // Remove DelaySeconds parameter and value for FIFO queues\n  DelaySeconds: 0,\n  MessageAttributes: {},\n  MessageBody: '{\"id\": \"'+parking_areas[i][0]+'\",\"latitude\": \"'+parking_areas[i][1]+'\",\"longitude\": \"'+parking_areas[i][2]+'\",\"free\": \"'+parking_areas[i][3]+'\",\"city\": \"'+parking_areas[i][4]+'\",\"zone\": \"'+parking_areas[i][5]+'\"}',\n  QueueUrl: \"http://host.docker.internal:4566/000000000000/\"+parking_areas[i][4]+\"_sensors\"\n};\n\nsqs.sendMessage(params, function(err, data) {\n  if (err) {\n    node.warn(err);\n    msg.payload=msg.payload+err;\n  } else {\n    node.warn(\"Success on sending\");\n    node.warn(data);\n    msg.payload=msg.payload+data;\n  }\n});\n}\nreturn msg;",
+        "func": "function getRandomInt(max) {\n  return Math.floor(Math.random() * max);\n}\n\nvar parking_areas=[];\nparking_area=['1', '41.0737547', '14.3563383', getRandomInt(2), 'Caserta', 'Via Rossi'];\nparking_areas.push(parking_area);\nparking_area=['2', '41.0737997', '14.3563568', getRandomInt(2), 'Caserta', 'Via Rossi'];\nparking_areas.push(parking_area); \nparking_area=['3', '41.0750437', '14.3570320', getRandomInt(2), 'Caserta', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['4', '41.0750480', '14.3569251', getRandomInt(2), 'Caserta', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['5', '41.0750934', '14.3569521', getRandomInt(2), 'Napoli', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['6', '41.0750480', '14.3569621', getRandomInt(2), 'Napoli', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['7', '41.0750480', '14.3569721', getRandomInt(2), 'Caserta', 'Via Verdi'];\nparking_areas.push(parking_area); \nparking_area=['8', '41.0750480', '14.3569821', getRandomInt(2), 'Salerno', 'Via Verdi'];\nparking_areas.push(parking_area);\n\nmsg.payload=JSON.stringify(parking_areas);\nnode.warn(\"The payload is: \"+msg.payload);\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "initialize": "node.warn(\"onStart\")\n",
+        "initialize": "\n",
         "finalize": "// Code added here will be run when the\n// node is being stopped or re-deployed.\nconsole.log(\"Error\", \"funge\");",
         "libs": [
             {
@@ -22,12 +22,11 @@
                 "module": "aws-sdk"
             }
         ],
-        "x": 540,
+        "x": 660,
         "y": 180,
         "wires": [
             [
-                "7e027818.c899b8",
-                "32849cd3.cb2ae4"
+                "ae458efe.287f1"
             ]
         ]
     },
@@ -48,7 +47,7 @@
         "bytopic": "all",
         "topic": "topic",
         "outputs": 1,
-        "x": 250,
+        "x": 370,
         "y": 180,
         "wires": [
             [
@@ -61,7 +60,7 @@
         "type": "function",
         "z": "cfd4ad9b.72d9b",
         "name": "Update_Free_Parking_Areas",
-        "func": "AWS.config.region = 'us-east-2';\nAWS.config.lambda = { \n    endpoint: \"host.docker.internal:4566\",\n    sslEnabled: false,\n    region: 'us-east-2',\n    accessKeyId: 'test',\n    secretAccessKey: 'test'};\nvar lambda = new AWS.Lambda({endpoint: 'host.docker.internal:4566'});\n\n\nvar params = {\n    FunctionName: 'Update_Free_Parking_Area_Function', // the lambda function we are going to invoke\n    InvocationType: 'Event',\n    LogType: 'Tail',\n    Payload: ''\n  };\n\n  lambda.invoke(params, function(err, data) {\n    if (err) {\n      node.warn(err);\n    } else {\n      return data.Payload;\n    }\n  });",
+        "func": "AWS.config.region = 'us-east-2';\nAWS.config.lambda = { \n    endpoint: \"host.docker.internal:4566\",\n    sslEnabled: false,\n    region: 'us-east-2',\n    accessKeyId: 'test',\n    secretAccessKey: 'test'};\nvar lambda = new AWS.Lambda({endpoint: 'host.docker.internal:4566'});\n\nvar stringa=JSON.parse(msg.payload);\n\nvar params = {\n    FunctionName: 'Update_Free_Parking_Area_Function', \n    InvocationType: 'RequestResponse',\n    LogType: 'Tail',\n    Payload: msg.payload\n  };\n\n  lambda.invoke(params, function(err, data) {\n    if (err) {\n      node.warn(err);\n    } else {\n      node.warn (data.Payload);\n      return data.Payload;\n    }\n  });\n  \n  ",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -72,8 +71,8 @@
                 "module": "aws-sdk"
             }
         ],
-        "x": 840,
-        "y": 180,
+        "x": 720,
+        "y": 320,
         "wires": [
             []
         ]
@@ -99,8 +98,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 150,
-        "y": 120,
+        "x": 140,
+        "y": 180,
         "wires": [
             [
                 "6a9a79ba.e57368"
@@ -117,10 +116,72 @@
         "createDir": false,
         "overwriteFile": "false",
         "encoding": "none",
-        "x": 770,
-        "y": 240,
+        "x": 650,
+        "y": 380,
         "wires": [
             []
         ]
+    },
+    {
+        "id": "53e20e31.36f4a",
+        "type": "mqtt in",
+        "z": "cfd4ad9b.72d9b",
+        "name": "",
+        "topic": "update_parkings",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "a57caf02.d73be",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 270,
+        "y": 320,
+        "wires": [
+            [
+                "7e027818.c899b8",
+                "32849cd3.cb2ae4"
+            ]
+        ]
+    },
+    {
+        "id": "ae458efe.287f1",
+        "type": "mqtt out",
+        "z": "cfd4ad9b.72d9b",
+        "name": "",
+        "topic": "update_parkings",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a57caf02.d73be",
+        "x": 930,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "a57caf02.d73be",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "mybroker",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "15",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeRetain": "false",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": ""
     }
 ]

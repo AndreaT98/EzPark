@@ -13,7 +13,7 @@ def lambda_handler(event, context):
 
     if event['city'] and event['mode']=="static_mode":
         db_response = table.scan(
-            FilterExpression=Attr('parking_area_zone').eq(event['zone']) & Attr('parking_area_city').eq(event['city'])
+            FilterExpression=(Attr('parking_area_zone').eq(event['zone'])) & (Attr('parking_area_city').eq(event['city']))
         )
         trovato = 0
         free_parkings = []
