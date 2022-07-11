@@ -27,10 +27,11 @@ If there are no free parking spot in the zone he chose, the website will show al
 
 - The application is based on AWS Services simulated using [LocalStack](https://localstack.cloud/).
 - To operate with all the services that AWS offers, the application uses the AWS SDK written in Python, called [Boto3](https://aws.amazon.com/sdk-for-python/)
-- The queues are implemented using [Amazon Simple Queue Service (SQS)](https://aws.amazon.com/sqs/).
+- The simulation of IoT sensors is done through [Node-RED](https://nodered.org/)
+- The queues are implemented in [Eclipse Mosquitto](https://mosquitto.org/) and the MQTT protocol.
 - The database is built using [Amazon DynamoDB](https://aws.amazon.com/dynamodb/).
 - The functions are Serveless functions deployed on [AWS Lambda](https://aws.amazon.com/lambda/).
-- The email is sent using [SES](https://aws.amazon.com/ses/).
+- The emails are sent using [AWS SES](https://aws.amazon.com/ses/).
 
 ## Installation and usage
 
